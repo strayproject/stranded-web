@@ -1,4 +1,5 @@
-var cacheName = 'stranded';
+const cachePrefix = 'stranded-';
+const cacheName = cachePrefix + '1777110228';
 
 /* Start the service worker and cache all of the app's content or use the existing one */
 self.addEventListener('install', function (e) {
@@ -7,7 +8,17 @@ self.addEventListener('install', function (e) {
 });
 
 self.addEventListener('activate', function (e) {
-    return self.clients.claim();
+    e.waitUntil((async function () {
+        const keys = await caches.keys();
+
+        await Promise.all(keys.map(function (key) {
+            if ((key === 'stranded' || key.startsWith(cachePrefix)) && key !== cacheName) {
+                return caches.delete(key);
+            }
+        }));
+
+        await self.clients.claim();
+    })());
 });
 
 
